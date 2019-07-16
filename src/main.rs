@@ -1,3 +1,5 @@
+pub mod pipe;
+
 use cursive::Cursive;
 use cursive::Vec2;
 use cursive::views::Canvas;
