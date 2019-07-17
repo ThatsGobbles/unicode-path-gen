@@ -1,7 +1,4 @@
-use crate::grid::Coordinate;
-use crate::grid::Position;
 use crate::grid::Direction;
-use crate::grid::Steering;
 
 const XU_XD_XL_XR: char = ' ';
 const XU_XD_XL_ER: char = '╶';

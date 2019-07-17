@@ -1,5 +1,3 @@
-use crate::traits::InBounds1D;
-
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
 pub enum Coordinate {
     Pos(usize),
@@ -48,6 +46,13 @@ impl Coordinate {
             &Coordinate::Neg(x) => Coordinate::Pos(x),
         }
     }
+
+    pub fn in_bounds(&self, length: usize) -> bool {
+        match self {
+            &Coordinate::Pos(a) => a < length,
+            &Coordinate::Neg(..) => false,
+        }
+    }
 }
 
 impl From<usize> for Coordinate {
@@ -59,15 +64,6 @@ impl From<usize> for Coordinate {
 impl Default for Coordinate {
     fn default() -> Self {
         Coordinate::Pos(0)
-    }
-}
-
-impl InBounds1D for Coordinate {
-    fn in_bounds(&self, length: usize) -> bool {
-        match self {
-            &Coordinate::Pos(a) => a < length,
-            &Coordinate::Neg(..) => false,
-        }
     }
 }
 

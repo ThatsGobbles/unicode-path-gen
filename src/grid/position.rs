@@ -1,7 +1,5 @@
 use crate::grid::Coordinate;
 use crate::grid::Direction;
-use crate::traits::InBounds1D;
-use crate::traits::InBounds2D;
 
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
 pub struct Position {
@@ -20,12 +18,6 @@ impl From<(usize, usize)> for Position {
         let x: Coordinate = x.into();
         let y: Coordinate = y.into();
         Self::from((x, y))
-    }
-}
-
-impl InBounds2D for Position {
-    fn in_bounds(&self, width: usize, height: usize) -> bool {
-        self.x.in_bounds(width) && self.y.in_bounds(height)
     }
 }
 
@@ -60,6 +52,10 @@ impl Position {
             x: self.x.flip(),
             y: self.y.flip(),
         }
+    }
+
+    pub fn in_bounds(&self, width: usize, height: usize) -> bool {
+        self.x.in_bounds(width) && self.y.in_bounds(height)
     }
 }
 
@@ -120,6 +116,78 @@ mod tests {
         for (inputs, expected) in inputs_and_expected {
             let (input_a, input_b) = inputs;
             let produced = input_a.shift(input_b);
+            assert_eq!(expected, produced);
+        }
+    }
+
+    #[test]
+    fn position_flip_x() {
+        let pos_p3_p2 = Position { x: Coordinate::Pos(3), y: Coordinate::Pos(2) };
+        let pos_p3_n2 = Position { x: Coordinate::Pos(3), y: Coordinate::Neg(2) };
+        let pos_n3_p2 = Position { x: Coordinate::Neg(3), y: Coordinate::Pos(2) };
+        let pos_n3_n2 = Position { x: Coordinate::Neg(3), y: Coordinate::Neg(2) };
+        let pos_p0_p0 = Position { x: Coordinate::Pos(0), y: Coordinate::Pos(0) };
+        let pos_n0_n0 = Position { x: Coordinate::Neg(0), y: Coordinate::Neg(0) };
+
+        let inputs_and_expected = vec![
+            (pos_p3_p2, np(3, 2)),
+            (pos_p3_n2, nn(3, 2)),
+            (pos_n3_p2, pp(3, 2)),
+            (pos_n3_n2, pn(3, 2)),
+            (pos_p0_p0, np(0, 0)),
+            (pos_n0_n0, pn(0, 0)),
+        ];
+
+        for (input, expected) in inputs_and_expected {
+            let produced = input.flip_x();
+            assert_eq!(expected, produced);
+        }
+    }
+
+    #[test]
+    fn position_flip_y() {
+        let pos_p3_p2 = Position { x: Coordinate::Pos(3), y: Coordinate::Pos(2) };
+        let pos_p3_n2 = Position { x: Coordinate::Pos(3), y: Coordinate::Neg(2) };
+        let pos_n3_p2 = Position { x: Coordinate::Neg(3), y: Coordinate::Pos(2) };
+        let pos_n3_n2 = Position { x: Coordinate::Neg(3), y: Coordinate::Neg(2) };
+        let pos_p0_p0 = Position { x: Coordinate::Pos(0), y: Coordinate::Pos(0) };
+        let pos_n0_n0 = Position { x: Coordinate::Neg(0), y: Coordinate::Neg(0) };
+
+        let inputs_and_expected = vec![
+            (pos_p3_p2, pn(3, 2)),
+            (pos_p3_n2, pp(3, 2)),
+            (pos_n3_p2, nn(3, 2)),
+            (pos_n3_n2, np(3, 2)),
+            (pos_p0_p0, pn(0, 0)),
+            (pos_n0_n0, np(0, 0)),
+        ];
+
+        for (input, expected) in inputs_and_expected {
+            let produced = input.flip_y();
+            assert_eq!(expected, produced);
+        }
+    }
+
+    #[test]
+    fn position_flip() {
+        let pos_p3_p2 = Position { x: Coordinate::Pos(3), y: Coordinate::Pos(2) };
+        let pos_p3_n2 = Position { x: Coordinate::Pos(3), y: Coordinate::Neg(2) };
+        let pos_n3_p2 = Position { x: Coordinate::Neg(3), y: Coordinate::Pos(2) };
+        let pos_n3_n2 = Position { x: Coordinate::Neg(3), y: Coordinate::Neg(2) };
+        let pos_p0_p0 = Position { x: Coordinate::Pos(0), y: Coordinate::Pos(0) };
+        let pos_n0_n0 = Position { x: Coordinate::Neg(0), y: Coordinate::Neg(0) };
+
+        let inputs_and_expected = vec![
+            (pos_p3_p2, nn(3, 2)),
+            (pos_p3_n2, np(3, 2)),
+            (pos_n3_p2, pn(3, 2)),
+            (pos_n3_n2, pp(3, 2)),
+            (pos_p0_p0, nn(0, 0)),
+            (pos_n0_n0, pp(0, 0)),
+        ];
+
+        for (input, expected) in inputs_and_expected {
+            let produced = input.flip();
             assert_eq!(expected, produced);
         }
     }
