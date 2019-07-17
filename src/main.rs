@@ -1,5 +1,8 @@
 pub mod pipe;
-pub mod coordinate;
+pub mod grid;
+pub mod anchor;
+pub mod grid_walk;
+pub mod traits;
 
 use cursive::Cursive;
 use cursive::Vec2;
