@@ -1,4 +1,5 @@
 pub mod pipe;
+pub mod coordinate;
 
 use cursive::Cursive;
 use cursive::Vec2;
