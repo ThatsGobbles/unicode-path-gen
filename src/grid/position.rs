@@ -24,10 +24,10 @@ impl From<(usize, usize)> for Position {
 impl Position {
     pub fn shift(&self, direction: Direction) -> Self {
         let (x, y) = match direction {
-            Direction::Up       => (self.x, self.y.sub(1)),
-            Direction::Down     => (self.x, self.y.add(1)),
-            Direction::Left     => (self.x.sub(1), self.y),
-            Direction::Right    => (self.x.add(1), self.y),
+            Direction::Up       => (self.x, self.y - 1),
+            Direction::Down     => (self.x, self.y + 1),
+            Direction::Left     => (self.x - 1, self.y),
+            Direction::Right    => (self.x + 1, self.y),
         };
 
         Self { x, y, }
@@ -35,7 +35,7 @@ impl Position {
 
     pub fn flip_x(&self) -> Self {
         Self {
-            x: self.x.flip(),
+            x: -self.x,
             y: self.y,
         }
     }
@@ -43,14 +43,14 @@ impl Position {
     pub fn flip_y(&self) -> Self {
         Self {
             x: self.x,
-            y: self.y.flip(),
+            y: -self.y,
         }
     }
 
     pub fn flip(&self) -> Self {
         Self {
-            x: self.x.flip(),
-            y: self.y.flip(),
+            x: -self.x,
+            y: -self.y,
         }
     }
 

@@ -33,9 +33,9 @@ impl Anchor {
     pub fn position(&self, width: usize, height: usize) -> Position {
         match self {
             &Anchor::North(x) => (x.into(), 0.into()),
-            &Anchor::South(x) => (x.into(), Coordinate::from(height).sub(1)),
+            &Anchor::South(x) => (x.into(), Coordinate::from(height) - 1),
             &Anchor::West(y) => (0.into(), y.into()),
-            &Anchor::East(y) => (Coordinate::from(width).sub(1), y.into()),
+            &Anchor::East(y) => (Coordinate::from(width) - 1, y.into()),
         }.into()
     }
 }

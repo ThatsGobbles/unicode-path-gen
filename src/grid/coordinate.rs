@@ -1,3 +1,5 @@
+use std::ops::{Add, Sub, Neg};
+
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
 pub enum Coordinate {
     Pos(usize),
@@ -14,43 +16,55 @@ impl Coordinate {
         }
     }
 
-    pub fn add(&self, n: usize) -> Self {
-        if n == 0 { *self }
+    pub fn in_bounds(&self, length: usize) -> bool {
+        match self {
+            &Coordinate::Pos(a) => a < length,
+            &Coordinate::Neg(..) => false,
+        }
+    }
+}
+
+impl Add<usize> for Coordinate {
+    type Output = Self;
+
+    fn add(self, n: usize) -> Self::Output {
+        if n == 0 { self }
         else {
             match self {
-                &Coordinate::Pos(a) => Coordinate::Pos(a + n),
-                &Coordinate::Neg(a) => {
+                Coordinate::Pos(a) => Coordinate::Pos(a + n),
+                Coordinate::Neg(a) => {
                     if a >= n { Coordinate::Neg(a - n) }
                     else { Coordinate::Pos(n - a - 1) }
                 },
             }
         }
     }
+}
 
-    pub fn sub(&self, n: usize) -> Self {
-        if n == 0 { *self }
+impl Sub<usize> for Coordinate {
+    type Output = Self;
+
+    fn sub(self, n: usize) -> Self::Output {
+        if n == 0 { self }
         else {
             match self {
-                &Coordinate::Neg(a) => Coordinate::Neg(a + n),
-                &Coordinate::Pos(a) => {
+                Coordinate::Neg(a) => Coordinate::Neg(a + n),
+                Coordinate::Pos(a) => {
                     if a >= n { Coordinate::Pos(a - n) }
                     else { Coordinate::Neg(n - a - 1) }
                 },
             }
         }
     }
+}
 
-    pub fn flip(&self) -> Self {
-        match self {
-            &Coordinate::Pos(x) => Coordinate::Neg(x),
-            &Coordinate::Neg(x) => Coordinate::Pos(x),
-        }
-    }
+impl Neg for Coordinate {
+    type Output = Self;
 
-    pub fn in_bounds(&self, length: usize) -> bool {
+    fn neg(self) -> Self::Output {
         match self {
-            &Coordinate::Pos(a) => a < length,
-            &Coordinate::Neg(..) => false,
+            Coordinate::Pos(x) => Coordinate::Neg(x),
+            Coordinate::Neg(x) => Coordinate::Pos(x),
         }
     }
 }
@@ -132,7 +146,7 @@ mod tests {
     }
 
     #[test]
-    fn coordinate_flip() {
+    fn coordinate_neg() {
         let inputs_and_expected = vec![
             (Coordinate::Pos(0), Coordinate::Neg(0)),
             (Coordinate::Pos(1), Coordinate::Neg(1)),
@@ -145,7 +159,7 @@ mod tests {
         ];
 
         for (input, expected) in inputs_and_expected {
-            let produced = input.flip();
+            let produced = input.neg();
             assert_eq!(expected, produced);
         }
     }
