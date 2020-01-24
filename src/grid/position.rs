@@ -8,18 +8,6 @@ pub struct Position {
     y: Coordinate,
 }
 
-impl From<(Coordinate, Coordinate)> for Position {
-    fn from((x, y): (Coordinate, Coordinate)) -> Self {
-        Self::new(x, y)
-    }
-}
-
-impl From<(usize, usize)> for Position {
-    fn from((x, y): (usize, usize)) -> Self {
-        Self::from_raw(x, y)
-    }
-}
-
 impl Position {
     pub fn new(x: Coordinate, y: Coordinate) -> Self {
         Self { x, y, }
@@ -70,36 +58,12 @@ mod tests {
 
     use strum::IntoEnumIterator;
 
-    fn pp(x: usize, y: usize) -> Position {
-        let x = Coordinate::Pos(x);
-        let y = Coordinate::Pos(y);
-        Position { x, y, }
-    }
-
-    fn pn(x: usize, y: usize) -> Position {
-        let x = Coordinate::Pos(x);
-        let y = Coordinate::Neg(y);
-        Position { x, y, }
-    }
-
-    fn np(x: usize, y: usize) -> Position {
-        let x = Coordinate::Neg(x);
-        let y = Coordinate::Pos(y);
-        Position { x, y, }
-    }
-
-    fn nn(x: usize, y: usize) -> Position {
-        let x = Coordinate::Neg(x);
-        let y = Coordinate::Neg(y);
-        Position { x, y, }
-    }
-
     #[test]
     fn shift() {
-        for shift_amount in 0usize..=3 {
+        for shift_amount in 0usize..=5 {
             for direction in Direction::iter() {
-                for x_raw in 0usize..=1 {
-                    for y_raw in 0usize..=1 {
+                for x_raw in 0usize..=5 {
+                    for y_raw in 0usize..=5 {
                         let xp = Coordinate::Pos(x_raw);
                         let yp = Coordinate::Pos(y_raw);
                         let xn = Coordinate::Neg(x_raw);
@@ -128,50 +92,72 @@ mod tests {
     }
 
     #[test]
-    fn position_flip_x() {
-        let pos_p3_p2 = Position { x: Coordinate::Pos(3), y: Coordinate::Pos(2) };
-        let pos_p3_n2 = Position { x: Coordinate::Pos(3), y: Coordinate::Neg(2) };
-        let pos_n3_p2 = Position { x: Coordinate::Neg(3), y: Coordinate::Pos(2) };
-        let pos_n3_n2 = Position { x: Coordinate::Neg(3), y: Coordinate::Neg(2) };
-        let pos_p0_p0 = Position { x: Coordinate::Pos(0), y: Coordinate::Pos(0) };
-        let pos_n0_n0 = Position { x: Coordinate::Neg(0), y: Coordinate::Neg(0) };
+    fn flip_x() {
+        for x_raw in 0usize..=5 {
+            for y_raw in 0usize..=5 {
+                let xp = Coordinate::Pos(x_raw);
+                let yp = Coordinate::Pos(y_raw);
+                let xn = Coordinate::Neg(x_raw);
+                let yn = Coordinate::Neg(y_raw);
 
-        let inputs_and_expected = vec![
-            (pos_p3_p2, np(3, 2)),
-            (pos_p3_n2, nn(3, 2)),
-            (pos_n3_p2, pp(3, 2)),
-            (pos_n3_n2, pn(3, 2)),
-            (pos_p0_p0, np(0, 0)),
-            (pos_n0_n0, pn(0, 0)),
-        ];
+                let pos_pp = Position::new(xp, yp);
+                let pos_pn = Position::new(xp, yn);
+                let pos_np = Position::new(xn, yp);
+                let pos_nn = Position::new(xn, yn);
 
-        for (input, expected) in inputs_and_expected {
-            let produced = input.flip_x();
-            assert_eq!(expected, produced);
+                assert_eq!(pos_pp.flip_x(), Position::new(-xp, yp));
+                assert_eq!(pos_pn.flip_x(), Position::new(-xp, yn));
+                assert_eq!(pos_np.flip_x(), Position::new(-xn, yp));
+                assert_eq!(pos_nn.flip_x(), Position::new(-xn, yn));
+            }
         }
     }
 
     #[test]
-    fn position_flip_y() {
-        let pos_p3_p2 = Position { x: Coordinate::Pos(3), y: Coordinate::Pos(2) };
-        let pos_p3_n2 = Position { x: Coordinate::Pos(3), y: Coordinate::Neg(2) };
-        let pos_n3_p2 = Position { x: Coordinate::Neg(3), y: Coordinate::Pos(2) };
-        let pos_n3_n2 = Position { x: Coordinate::Neg(3), y: Coordinate::Neg(2) };
-        let pos_p0_p0 = Position { x: Coordinate::Pos(0), y: Coordinate::Pos(0) };
-        let pos_n0_n0 = Position { x: Coordinate::Neg(0), y: Coordinate::Neg(0) };
+    fn flip_y() {
+        for x_raw in 0usize..=5 {
+            for y_raw in 0usize..=5 {
+                let xp = Coordinate::Pos(x_raw);
+                let yp = Coordinate::Pos(y_raw);
+                let xn = Coordinate::Neg(x_raw);
+                let yn = Coordinate::Neg(y_raw);
 
-        let inputs_and_expected = vec![
-            (pos_p3_p2, pn(3, 2)),
-            (pos_p3_n2, pp(3, 2)),
-            (pos_n3_p2, nn(3, 2)),
-            (pos_n3_n2, np(3, 2)),
-            (pos_p0_p0, pn(0, 0)),
-            (pos_n0_n0, np(0, 0)),
-        ];
+                let pos_pp = Position::new(xp, yp);
+                let pos_pn = Position::new(xp, yn);
+                let pos_np = Position::new(xn, yp);
+                let pos_nn = Position::new(xn, yn);
 
-        for (input, expected) in inputs_and_expected {
-            let produced = input.flip_y();
-            assert_eq!(expected, produced);
+                assert_eq!(pos_pp.flip_y(), Position::new(xp, -yp));
+                assert_eq!(pos_pn.flip_y(), Position::new(xp, -yn));
+                assert_eq!(pos_np.flip_y(), Position::new(xn, -yp));
+                assert_eq!(pos_nn.flip_y(), Position::new(xn, -yn));
+            }
+        }
+    }
+
+    #[test]
+    fn in_bounds() {
+        for x_bound in 0usize..=9 {
+            for y_bound in 0usize..=9 {
+                for x_raw in 0usize..=5 {
+                    for y_raw in 0usize..=5 {
+                        let xp = Coordinate::Pos(x_raw);
+                        let yp = Coordinate::Pos(y_raw);
+                        let xn = Coordinate::Neg(x_raw);
+                        let yn = Coordinate::Neg(y_raw);
+
+                        let pos_pp = Position::new(xp, yp);
+                        let pos_pn = Position::new(xp, yn);
+                        let pos_np = Position::new(xn, yp);
+                        let pos_nn = Position::new(xn, yn);
+
+                        assert_eq!(pos_pp.in_bounds(x_bound, y_bound), x_raw < x_bound && y_raw < y_bound);
+                        assert_eq!(pos_pn.in_bounds(x_bound, y_bound), false);
+                        assert_eq!(pos_np.in_bounds(x_bound, y_bound), false);
+                        assert_eq!(pos_nn.in_bounds(x_bound, y_bound), false);
+                    }
+                }
+            }
         }
     }
 }

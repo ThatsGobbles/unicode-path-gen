@@ -31,11 +31,13 @@ impl Anchor {
     }
 
     pub fn position(&self, width: usize, height: usize) -> Position {
-        match self {
+        let (x_co, y_co) = match self {
             &Anchor::North(x) => (x.into(), 0.into()),
             &Anchor::South(x) => (x.into(), Coordinate::from(height) - 1),
             &Anchor::West(y) => (0.into(), y.into()),
             &Anchor::East(y) => (Coordinate::from(width) - 1, y.into()),
-        }.into()
+        };
+
+        Position::new(x_co, y_co)
     }
 }
