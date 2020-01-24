@@ -112,19 +112,19 @@ impl PipeCell {
 
     pub fn lay_down(&mut self, dir: Direction, pipe: Pipe) -> Option<Pipe> {
         match dir {
-            Direction::Up => self.u.replace(pipe),
-            Direction::Down => self.d.replace(pipe),
-            Direction::Left => self.l.replace(pipe),
-            Direction::Right => self.r.replace(pipe),
+            Direction::North => self.u.replace(pipe),
+            Direction::South => self.d.replace(pipe),
+            Direction::West => self.l.replace(pipe),
+            Direction::East => self.r.replace(pipe),
         }
     }
 
     pub fn dig_up(&mut self, dir: Direction) -> Option<Pipe> {
         match dir {
-            Direction::Up => self.u.take(),
-            Direction::Down => self.d.take(),
-            Direction::Left => self.l.take(),
-            Direction::Right => self.r.take(),
+            Direction::North => self.u.take(),
+            Direction::South => self.d.take(),
+            Direction::West => self.l.take(),
+            Direction::East => self.r.take(),
         }
     }
 

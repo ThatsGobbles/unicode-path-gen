@@ -20,10 +20,10 @@ impl Position {
     /// Shift this `Position` a number of units in the specified `Direction`.
     pub fn shift(&self, direction: Direction, n: usize) -> Self {
         let (x, y) = match direction {
-            Direction::Up       => (self.x, self.y - n),
-            Direction::Down     => (self.x, self.y + n),
-            Direction::Left     => (self.x - n, self.y),
-            Direction::Right    => (self.x + n, self.y),
+            Direction::North => (self.x, self.y - n),
+            Direction::South => (self.x, self.y + n),
+            Direction::West => (self.x - n, self.y),
+            Direction::East => (self.x + n, self.y),
         };
 
         Self { x, y, }
@@ -59,10 +59,10 @@ mod tests {
                         let pos_nn = Position::new(xn, yn);
 
                         let (exp_xp, exp_xn, exp_yp, exp_yn) = match direction {
-                            Direction::Left => (xp - shift_amount, xn - shift_amount, yp, yn),
-                            Direction::Right => (xp + shift_amount, xn + shift_amount, yp, yn),
-                            Direction::Up => (xp, xn, yp - shift_amount, yn - shift_amount),
-                            Direction::Down => (xp, xn, yp + shift_amount, yn + shift_amount),
+                            Direction::West => (xp - shift_amount, xn - shift_amount, yp, yn),
+                            Direction::East => (xp + shift_amount, xn + shift_amount, yp, yn),
+                            Direction::North => (xp, xn, yp - shift_amount, yn - shift_amount),
+                            Direction::South => (xp, xn, yp + shift_amount, yn + shift_amount),
                         };
 
                         assert_eq!(pos_pp.shift(direction, shift_amount), Position::new(exp_xp, exp_yp));

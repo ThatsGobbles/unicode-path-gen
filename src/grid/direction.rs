@@ -4,40 +4,40 @@ use crate::grid::Steering;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, EnumIter)]
 pub enum Direction {
-    Up,
-    Down,
-    Left,
-    Right,
+    North,
+    South,
+    West,
+    East,
 }
 
 impl Direction {
     /// Inverts this `Direction`.
     pub fn invert(&self) -> Self {
         match self {
-            &Self::Up => Self::Down,
-            &Self::Down => Self::Up,
-            &Self::Left => Self::Right,
-            &Self::Right => Self::Left,
+            &Self::North => Self::South,
+            &Self::South => Self::North,
+            &Self::West => Self::East,
+            &Self::East => Self::West,
         }
     }
 
     /// Rotates this `Direction` to the left (anticlockwise).
     pub fn turn_left(&self) -> Self {
         match self {
-            &Self::Up => Self::Left,
-            &Self::Down => Self::Right,
-            &Self::Left => Self::Down,
-            &Self::Right => Self::Up,
+            &Self::North => Self::West,
+            &Self::South => Self::East,
+            &Self::West => Self::South,
+            &Self::East => Self::North,
         }
     }
 
     /// Rotates this `Direction` to the right (clockwise).
     pub fn turn_right(&self) -> Self {
         match self {
-            &Self::Up => Self::Right,
-            &Self::Down => Self::Left,
-            &Self::Left => Self::Up,
-            &Self::Right => Self::Down,
+            &Self::North => Self::East,
+            &Self::South => Self::West,
+            &Self::West => Self::North,
+            &Self::East => Self::South,
         }
     }
 
@@ -57,43 +57,43 @@ mod tests {
 
     #[test]
     fn invert() {
-        assert_eq!(Direction::Up.invert(), Direction::Down);
-        assert_eq!(Direction::Down.invert(), Direction::Up);
-        assert_eq!(Direction::Left.invert(), Direction::Right);
-        assert_eq!(Direction::Right.invert(), Direction::Left);
+        assert_eq!(Direction::North.invert(), Direction::South);
+        assert_eq!(Direction::South.invert(), Direction::North);
+        assert_eq!(Direction::West.invert(), Direction::East);
+        assert_eq!(Direction::East.invert(), Direction::West);
     }
 
     #[test]
     fn turn_left() {
-        assert_eq!(Direction::Up.turn_left(), Direction::Left);
-        assert_eq!(Direction::Down.turn_left(), Direction::Right);
-        assert_eq!(Direction::Left.turn_left(), Direction::Down);
-        assert_eq!(Direction::Right.turn_left(), Direction::Up);
+        assert_eq!(Direction::North.turn_left(), Direction::West);
+        assert_eq!(Direction::South.turn_left(), Direction::East);
+        assert_eq!(Direction::West.turn_left(), Direction::South);
+        assert_eq!(Direction::East.turn_left(), Direction::North);
     }
 
     #[test]
     fn turn_right() {
-        assert_eq!(Direction::Up.turn_right(), Direction::Right);
-        assert_eq!(Direction::Down.turn_right(), Direction::Left);
-        assert_eq!(Direction::Left.turn_right(), Direction::Up);
-        assert_eq!(Direction::Right.turn_right(), Direction::Down);
+        assert_eq!(Direction::North.turn_right(), Direction::East);
+        assert_eq!(Direction::South.turn_right(), Direction::West);
+        assert_eq!(Direction::West.turn_right(), Direction::North);
+        assert_eq!(Direction::East.turn_right(), Direction::South);
     }
 
     #[test]
     fn steer() {
-        assert_eq!(Direction::Up.steer(Steering::Straight), Direction::Up);
-        assert_eq!(Direction::Down.steer(Steering::Straight), Direction::Down);
-        assert_eq!(Direction::Left.steer(Steering::Straight), Direction::Left);
-        assert_eq!(Direction::Right.steer(Steering::Straight), Direction::Right);
+        assert_eq!(Direction::North.steer(Steering::Straight), Direction::North);
+        assert_eq!(Direction::South.steer(Steering::Straight), Direction::South);
+        assert_eq!(Direction::West.steer(Steering::Straight), Direction::West);
+        assert_eq!(Direction::East.steer(Steering::Straight), Direction::East);
 
-        assert_eq!(Direction::Up.steer(Steering::Left), Direction::Left);
-        assert_eq!(Direction::Down.steer(Steering::Left), Direction::Right);
-        assert_eq!(Direction::Left.steer(Steering::Left), Direction::Down);
-        assert_eq!(Direction::Right.steer(Steering::Left), Direction::Up);
+        assert_eq!(Direction::North.steer(Steering::Left), Direction::West);
+        assert_eq!(Direction::South.steer(Steering::Left), Direction::East);
+        assert_eq!(Direction::West.steer(Steering::Left), Direction::South);
+        assert_eq!(Direction::East.steer(Steering::Left), Direction::North);
 
-        assert_eq!(Direction::Up.steer(Steering::Right), Direction::Right);
-        assert_eq!(Direction::Down.steer(Steering::Right), Direction::Left);
-        assert_eq!(Direction::Left.steer(Steering::Right), Direction::Up);
-        assert_eq!(Direction::Right.steer(Steering::Right), Direction::Down);
+        assert_eq!(Direction::North.steer(Steering::Right), Direction::East);
+        assert_eq!(Direction::South.steer(Steering::Right), Direction::West);
+        assert_eq!(Direction::West.steer(Steering::Right), Direction::North);
+        assert_eq!(Direction::East.steer(Steering::Right), Direction::South);
     }
 }
