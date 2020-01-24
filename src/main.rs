@@ -1,6 +1,5 @@
 pub mod pipe;
 pub mod grid;
-pub mod anchor;
 pub mod grid_walk;
 
 use cursive::Cursive;

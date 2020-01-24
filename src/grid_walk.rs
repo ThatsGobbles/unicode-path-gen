@@ -1,7 +1,7 @@
 use crate::grid::Steering;
 use crate::grid::Position;
 use crate::grid::Direction;
-use crate::anchor::Anchor;
+use crate::grid::Anchor;
 
 pub struct GridWalk<'a> {
     anchor: Anchor,
@@ -38,7 +38,7 @@ impl<'a> PositionIter<'a> {
     pub fn new(steerings: &'a [Steering], anchor: Anchor, has_entered_new: bool, width: usize, height: usize) -> Self {
         let steerings_iter = steerings.iter();
         let curr_pos = anchor.position(width, height);
-        let curr_dir = anchor.direction();
+        let curr_dir = anchor.normal();
 
         Self {
             steerings_iter,

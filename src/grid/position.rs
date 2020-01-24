@@ -29,22 +29,6 @@ impl Position {
         Self { x, y, }
     }
 
-    /// Flips this `Position` along the x-axis.
-    pub fn flip_x(&self) -> Self {
-        Self {
-            x: -self.x,
-            y: self.y,
-        }
-    }
-
-    /// Flips this `Position` along the y-axis.
-    pub fn flip_y(&self) -> Self {
-        Self {
-            x: self.x,
-            y: -self.y,
-        }
-    }
-
     /// Checks if this `Position` is inside a two-dimensional bounding region,
     /// from [(0, 0), (width, length)).
     pub fn in_bounds(&self, width: usize, height: usize) -> bool {
@@ -87,50 +71,6 @@ mod tests {
                         assert_eq!(pos_nn.shift(direction, shift_amount), Position::new(exp_xn, exp_yn));
                     }
                 }
-            }
-        }
-    }
-
-    #[test]
-    fn flip_x() {
-        for x_raw in 0usize..=5 {
-            for y_raw in 0usize..=5 {
-                let xp = Coordinate::Pos(x_raw);
-                let yp = Coordinate::Pos(y_raw);
-                let xn = Coordinate::Neg(x_raw);
-                let yn = Coordinate::Neg(y_raw);
-
-                let pos_pp = Position::new(xp, yp);
-                let pos_pn = Position::new(xp, yn);
-                let pos_np = Position::new(xn, yp);
-                let pos_nn = Position::new(xn, yn);
-
-                assert_eq!(pos_pp.flip_x(), Position::new(-xp, yp));
-                assert_eq!(pos_pn.flip_x(), Position::new(-xp, yn));
-                assert_eq!(pos_np.flip_x(), Position::new(-xn, yp));
-                assert_eq!(pos_nn.flip_x(), Position::new(-xn, yn));
-            }
-        }
-    }
-
-    #[test]
-    fn flip_y() {
-        for x_raw in 0usize..=5 {
-            for y_raw in 0usize..=5 {
-                let xp = Coordinate::Pos(x_raw);
-                let yp = Coordinate::Pos(y_raw);
-                let xn = Coordinate::Neg(x_raw);
-                let yn = Coordinate::Neg(y_raw);
-
-                let pos_pp = Position::new(xp, yp);
-                let pos_pn = Position::new(xp, yn);
-                let pos_np = Position::new(xn, yp);
-                let pos_nn = Position::new(xn, yn);
-
-                assert_eq!(pos_pp.flip_y(), Position::new(xp, -yp));
-                assert_eq!(pos_pn.flip_y(), Position::new(xp, -yn));
-                assert_eq!(pos_np.flip_y(), Position::new(xn, -yp));
-                assert_eq!(pos_nn.flip_y(), Position::new(xn, -yn));
             }
         }
     }
