@@ -1,9 +1,10 @@
 use std::ops::{Add, Sub, Neg};
+use std::cmp::{Ord, PartialOrd, Ordering};
 
 /// A one-dimensional, zero-indexed position of the center of a character cell.
 /// All coordinates are either strictly positive or strictly negative; there is
 /// no "zero" position.
-#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
+#[derive(Copy, Clone, Eq, Hash, Debug)]
 pub enum Coordinate {
     Pos(usize),
     Neg(usize),
@@ -76,6 +77,29 @@ impl Neg for Coordinate {
     }
 }
 
+impl Ord for Coordinate {
+    fn cmp(&self, other: &Self) -> Ordering {
+        match (self, other) {
+            (Self::Pos(a), Self::Pos(b)) => a.cmp(&b),
+            (Self::Pos(_), Self::Neg(_)) => Ordering::Greater,
+            (Self::Neg(_), Self::Pos(_)) => Ordering::Less,
+            (Self::Neg(a), Self::Neg(b)) => a.cmp(&b).reverse(),
+        }
+    }
+}
+
+impl PartialOrd for Coordinate {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl PartialEq for Coordinate {
+    fn eq(&self, other: &Self) -> bool {
+        self.cmp(other) == Ordering::Equal
+    }
+}
+
 impl From<usize> for Coordinate {
     fn from(n: usize) -> Self {
         Self::Pos(n)
@@ -93,7 +117,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn coordinate_distance() {
+    fn distance() {
         let inputs_and_expected = vec![
             ((Coordinate::Pos(8), Coordinate::Pos(2)), 6),
             ((Coordinate::Pos(2), Coordinate::Pos(8)), 6),
@@ -115,7 +139,7 @@ mod tests {
     }
 
     #[test]
-    fn coordinate_add() {
+    fn add() {
         let inputs_and_expected = vec![
             ((Coordinate::Pos(8), 2), Coordinate::Pos(10)),
             ((Coordinate::Pos(2), 8), Coordinate::Pos(10)),
@@ -137,7 +161,7 @@ mod tests {
     }
 
     #[test]
-    fn coordinate_sub() {
+    fn sub() {
         let inputs_and_expected = vec![
             ((Coordinate::Pos(8), 2), Coordinate::Pos(6)),
             ((Coordinate::Pos(2), 8), Coordinate::Neg(5)),
@@ -159,7 +183,7 @@ mod tests {
     }
 
     #[test]
-    fn coordinate_neg() {
+    fn neg() {
         let inputs_and_expected = vec![
             (Coordinate::Pos(0), Coordinate::Neg(0)),
             (Coordinate::Pos(1), Coordinate::Neg(1)),
@@ -180,7 +204,7 @@ mod tests {
     }
 
     #[test]
-    fn coordinate_from_usize() {
+    fn from_usize() {
         let inputs_and_expected = vec![
             (0, Coordinate::Pos(0)),
             (1, Coordinate::Pos(1)),
@@ -201,14 +225,14 @@ mod tests {
     }
 
     #[test]
-    fn coordinate_default() {
+    fn default() {
         let expected = Coordinate::Pos(0);
         let produced = Coordinate::default();
         assert_eq!(expected, produced);
     }
 
     #[test]
-    fn coordinate_in_bounds() {
+    fn in_bounds() {
         let inputs_and_expected = vec![
             ((Coordinate::Pos(0), 9), true),
             ((Coordinate::Pos(5), 6), true),
