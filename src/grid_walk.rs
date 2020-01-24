@@ -21,8 +21,8 @@ impl<'a> GridWalk<'a> {
         (len_seg / 2) + (len_seg % 2)
     }
 
-    pub fn iter_positions(&self, width: usize, height: usize) -> PositionIter<'a> {
-        PositionIter::new(self.steerings, self.anchor, self.has_entered_new, width, height)
+    pub fn iter_positions(&self, x_length: usize, y_length: usize) -> PositionIter<'a> {
+        PositionIter::new(self.steerings, self.anchor, self.has_entered_new, x_length, y_length)
     }
 }
 
@@ -35,10 +35,10 @@ pub struct PositionIter<'a> {
 }
 
 impl<'a> PositionIter<'a> {
-    pub fn new(steerings: &'a [Steering], anchor: Anchor, has_entered_new: bool, width: usize, height: usize) -> Self {
+    pub fn new(steerings: &'a [Steering], anchor: Anchor, has_entered_new: bool, x_length: usize, y_length: usize) -> Self {
         let steerings_iter = steerings.iter();
-        let curr_pos = anchor.position(width, height);
-        let curr_dir = anchor.normal();
+        let curr_pos = anchor.position(x_length, y_length);
+        let curr_dir = anchor.heading();
 
         Self {
             steerings_iter,

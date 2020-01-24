@@ -217,35 +217,35 @@ impl PipeCell {
 
 pub struct PipeGrid {
     grid: Vec<PipeCell>,
-    width: usize,
-    height: usize,
+    x_length: usize,
+    y_length: usize,
 }
 
 impl PipeGrid {
-    pub fn new(width: usize, height: usize) -> Self {
-        let grid = vec![PipeCell::default(); width * height];
-        Self { grid, width, height, }
+    pub fn new(x_length: usize, y_length: usize) -> Self {
+        let grid = vec![PipeCell::default(); x_length * y_length];
+        Self { grid, x_length, y_length, }
     }
 
     #[inline]
-    pub fn width(&self) -> usize {
-        self.width
+    pub fn x_length(&self) -> usize {
+        self.x_length
     }
 
     #[inline]
-    pub fn height(&self) -> usize {
-        self.height
+    pub fn y_length(&self) -> usize {
+        self.y_length
     }
 
     pub fn get(&self, x: usize, y: usize) -> Option<&PipeCell> {
-        if x < self.width() && y < self.height() {
+        if x < self.x_length() && y < self.y_length() {
             self.grid.get(x * y)
         }
         else { None }
     }
 
     pub fn get_mut(&mut self, x: usize, y: usize) -> Option<&mut PipeCell> {
-        if x < self.width() && y < self.height() {
+        if x < self.x_length() && y < self.y_length() {
             self.grid.get_mut(x * y)
         }
         else { None }

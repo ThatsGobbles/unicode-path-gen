@@ -12,7 +12,7 @@ pub enum Direction {
 
 impl Direction {
     /// Inverts this `Direction`.
-    pub fn flip(&self) -> Self {
+    pub fn invert(&self) -> Self {
         match self {
             &Self::Up => Self::Down,
             &Self::Down => Self::Up,
@@ -56,11 +56,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn flip() {
-        assert_eq!(Direction::Up.flip(), Direction::Down);
-        assert_eq!(Direction::Down.flip(), Direction::Up);
-        assert_eq!(Direction::Left.flip(), Direction::Right);
-        assert_eq!(Direction::Right.flip(), Direction::Left);
+    fn invert() {
+        assert_eq!(Direction::Up.invert(), Direction::Down);
+        assert_eq!(Direction::Down.invert(), Direction::Up);
+        assert_eq!(Direction::Left.invert(), Direction::Right);
+        assert_eq!(Direction::Right.invert(), Direction::Left);
     }
 
     #[test]

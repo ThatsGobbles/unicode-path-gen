@@ -30,9 +30,9 @@ impl Position {
     }
 
     /// Checks if this `Position` is inside a two-dimensional bounding region,
-    /// from [(0, 0), (width, length)).
-    pub fn in_bounds(&self, width: usize, height: usize) -> bool {
-        self.x.in_bounds(width) && self.y.in_bounds(height)
+    /// from [(0, 0), (x_length, y_length)).
+    pub fn in_bounds(&self, x_length: usize, y_length: usize) -> bool {
+        self.x.in_bounds(x_length) && self.y.in_bounds(y_length)
     }
 }
 
