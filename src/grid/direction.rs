@@ -1,6 +1,8 @@
+use strum_macros::EnumIter;
+
 use crate::grid::Steering;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, EnumIter)]
 pub enum Direction {
     Up,
     Down,

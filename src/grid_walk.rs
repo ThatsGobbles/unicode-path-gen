@@ -66,7 +66,7 @@ impl<'a> Iterator for PositionIter<'a> {
 
                 let next_dir = self.curr_dir.steer(*steering);
                 self.curr_dir = next_dir;
-                self.curr_pos = self.curr_pos.shift(next_dir);
+                self.curr_pos = self.curr_pos.shift(next_dir, 1);
 
                 Some(pos)
             }

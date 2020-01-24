@@ -20,9 +20,9 @@ impl Coordinate {
         }
     }
 
-    /// Helper method to check if a `Coordinate` is inside a one-dimensional
-    /// bounding region, from [0, length).
-    /// Note that negative `Coordinate`s are never considered to be in bounds.
+    /// Checks if this `Coordinate` is inside a one-dimensional bounding region,
+    /// from [0, length). Note that negative `Coordinate`s are never considered
+    /// to be in bounds.
     pub fn in_bounds(&self, length: usize) -> bool {
         match self {
             &Self::Pos(a) => a < length,
