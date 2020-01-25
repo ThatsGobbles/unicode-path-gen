@@ -54,75 +54,107 @@ impl Anchor {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-//     #[test]
-//     fn in_bounds() {
-//         for x_bound in 0usize..=9 {
-//             for y_bound in 0usize..=9 {
-//                 for a in 0usize..=5 {
-//                     let ap = Coordinate::Pos(a);
-//                     let an = Coordinate::Neg(a);
+    use strum::IntoEnumIterator;
 
-//                     assert_eq!(Anchor::North(ap).in_bounds(x_bound, y_bound), a < x_bound);
-//                     assert_eq!(Anchor::South(ap).in_bounds(x_bound, y_bound), a < x_bound);
-//                     assert_eq!(Anchor::West(ap).in_bounds(x_bound, y_bound), a < y_bound);
-//                     assert_eq!(Anchor::East(ap).in_bounds(x_bound, y_bound), a < y_bound);
+    #[test]
+    fn in_bounds() {
+        for direction in Direction::iter() {
+            for x_length in 0usize..=9 {
+                for y_length in 0usize..=9 {
+                    for a in 0usize..=5 {
+                        let co_pos = Coordinate::Pos(a);
+                        let co_neg = Coordinate::Neg(a);
 
-//                     assert_eq!(Anchor::North(an).in_bounds(x_bound, y_bound), false);
-//                     assert_eq!(Anchor::South(an).in_bounds(x_bound, y_bound), false);
-//                     assert_eq!(Anchor::West(an).in_bounds(x_bound, y_bound), false);
-//                     assert_eq!(Anchor::East(an).in_bounds(x_bound, y_bound), false);
-//                 }
-//             }
-//         }
-//     }
+                        let anchor_edge_pos = Anchor::Edge(direction, co_pos);
+                        let anchor_edge_neg = Anchor::Edge(direction, co_neg);
 
-//     #[test]
-//     fn position() {
-//         for x_bound in 0usize..=9 {
-//             for y_bound in 0usize..=9 {
-//                 for a in 0usize..=5 {
-//                     let ap = Coordinate::Pos(a);
-//                     let an = Coordinate::Neg(a);
+                        let exp_result = match direction {
+                            Direction::North | Direction::South => a < x_length,
+                            Direction::West | Direction::East => a < y_length,
+                        };
 
-//                     assert_eq!(
-//                         Anchor::North(ap).position(x_bound, y_bound),
-//                         Position::new(ap, 0.into()),
-//                     );
-//                     assert_eq!(
-//                         Anchor::South(ap).position(x_bound, y_bound),
-//                         Position::new(ap, Coordinate::from(y_bound) - 1),
-//                     );
-//                     assert_eq!(
-//                         Anchor::West(ap).position(x_bound, y_bound),
-//                         Position::new(0.into(), ap),
-//                     );
-//                     assert_eq!(
-//                         Anchor::East(ap).position(x_bound, y_bound),
-//                         Position::new(Coordinate::from(x_bound) - 1, ap),
-//                     );
+                        assert_eq!(anchor_edge_pos.in_bounds(x_length, y_length), exp_result);
+                        assert_eq!(anchor_edge_neg.in_bounds(x_length, y_length), false);
 
-//                     assert_eq!(
-//                         Anchor::North(an).position(x_bound, y_bound),
-//                         Position::new(an, 0.into()),
-//                     );
-//                     assert_eq!(
-//                         Anchor::South(an).position(x_bound, y_bound),
-//                         Position::new(an, Coordinate::from(y_bound) - 1),
-//                     );
-//                     assert_eq!(
-//                         Anchor::West(an).position(x_bound, y_bound),
-//                         Position::new(0.into(), an),
-//                     );
-//                     assert_eq!(
-//                         Anchor::East(an).position(x_bound, y_bound),
-//                         Position::new(Coordinate::from(x_bound) - 1, an),
-//                     );
-//                 }
-//             }
-//         }
-//     }
-// }
+                        for b in 0usize..=5 {
+                            let co_x_pos = Coordinate::Pos(a);
+                            let co_x_neg = Coordinate::Neg(a);
+                            let co_y_pos = Coordinate::Pos(b);
+                            let co_y_neg = Coordinate::Neg(b);
+
+                            let pos_pp = Position::new(co_x_pos, co_y_pos);
+                            let pos_pn = Position::new(co_x_pos, co_y_neg);
+                            let pos_np = Position::new(co_x_neg, co_y_pos);
+                            let pos_nn = Position::new(co_x_neg, co_y_neg);
+
+                            let anchor_cell_pp = Anchor::Cell(direction, pos_pp);
+                            let anchor_cell_pn = Anchor::Cell(direction, pos_pn);
+                            let anchor_cell_np = Anchor::Cell(direction, pos_np);
+                            let anchor_cell_nn = Anchor::Cell(direction, pos_nn);
+
+                            assert_eq!(anchor_cell_pp.in_bounds(x_length, y_length), a < x_length && b < y_length);
+                            assert_eq!(anchor_cell_pn.in_bounds(x_length, y_length), false);
+                            assert_eq!(anchor_cell_np.in_bounds(x_length, y_length), false);
+                            assert_eq!(anchor_cell_nn.in_bounds(x_length, y_length), false);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // #[test]
+    // fn position() {
+    //     for direction in Direction::iter() {
+    //         for x_length in 0usize..=9 {
+    //             for y_length in 0usize..=9 {
+    //                 for a in 0usize..=5 {
+    //                     let co_pos = Coordinate::Pos(a);
+    //                     let co_neg = Coordinate::Neg(a);
+
+    //                     let anchor_edge_pos = Anchor::Edge(direction, co_pos);
+    //                     let anchor_edge_neg = Anchor::Edge(direction, co_neg);
+
+    //                     let (co_xp, co_yp, co_xn, co_yn) = match direction {
+    //                         Direction::North => (co_pos, 0.into(), co_neg, 0.into()),
+    //                         Direction::South => (co_pos, y_length.into() - 1, co_neg, y_length.into() - 1),
+    //                         Direction::West => (0.into(), co_pos, 0.into(), co_neg),
+    //                         Direction::East => (x_length.into() - 1, co_pos, x_length.into() - 1, co_neg),
+    //                     };
+
+    //                     let exp_pos_pos = Position::new(co_xp, co_yp);
+
+    //                     assert_eq!(anchor_edge_pos.position(x_length, y_length), exp_result);
+    //                     assert_eq!(anchor_edge_neg.position(x_length, y_length), false);
+
+    //                     for b in 0usize..=5 {
+    //                         let co_x_pos = Coordinate::Pos(a);
+    //                         let co_x_neg = Coordinate::Neg(a);
+    //                         let co_y_pos = Coordinate::Pos(b);
+    //                         let co_y_neg = Coordinate::Neg(b);
+
+    //                         let pos_pp = Position::new(co_x_pos, co_y_pos);
+    //                         let pos_pn = Position::new(co_x_pos, co_y_neg);
+    //                         let pos_np = Position::new(co_x_neg, co_y_pos);
+    //                         let pos_nn = Position::new(co_x_neg, co_y_neg);
+
+    //                         let anchor_cell_pp = Anchor::Cell(direction, pos_pp);
+    //                         let anchor_cell_pn = Anchor::Cell(direction, pos_pn);
+    //                         let anchor_cell_np = Anchor::Cell(direction, pos_np);
+    //                         let anchor_cell_nn = Anchor::Cell(direction, pos_nn);
+
+    //                         assert_eq!(anchor_cell_pp.position(x_length, y_length), a < x_length && b < y_length);
+    //                         assert_eq!(anchor_cell_pn.position(x_length, y_length), false);
+    //                         assert_eq!(anchor_cell_np.position(x_length, y_length), false);
+    //                         assert_eq!(anchor_cell_nn.position(x_length, y_length), false);
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+}

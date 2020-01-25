@@ -77,8 +77,8 @@ mod tests {
 
     #[test]
     fn in_bounds() {
-        for x_bound in 0usize..=9 {
-            for y_bound in 0usize..=9 {
+        for x_length in 0usize..=9 {
+            for y_length in 0usize..=9 {
                 for x_raw in 0usize..=5 {
                     for y_raw in 0usize..=5 {
                         let xp = Coordinate::Pos(x_raw);
@@ -91,10 +91,10 @@ mod tests {
                         let pos_np = Position::new(xn, yp);
                         let pos_nn = Position::new(xn, yn);
 
-                        assert_eq!(pos_pp.in_bounds(x_bound, y_bound), x_raw < x_bound && y_raw < y_bound);
-                        assert_eq!(pos_pn.in_bounds(x_bound, y_bound), false);
-                        assert_eq!(pos_np.in_bounds(x_bound, y_bound), false);
-                        assert_eq!(pos_nn.in_bounds(x_bound, y_bound), false);
+                        assert_eq!(pos_pp.in_bounds(x_length, y_length), x_raw < x_length && y_raw < y_length);
+                        assert_eq!(pos_pn.in_bounds(x_length, y_length), false);
+                        assert_eq!(pos_np.in_bounds(x_length, y_length), false);
+                        assert_eq!(pos_nn.in_bounds(x_length, y_length), false);
                     }
                 }
             }
