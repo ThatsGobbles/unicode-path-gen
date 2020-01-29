@@ -1,7 +1,8 @@
 use crate::grid::Direction;
 use crate::grid::Position;
 use crate::grid::Steering;
-use crate::grid::PipeCell;
+use crate::grid::Pipe;
+use crate::grid::Cell;
 
 // pub enum Alignment {
 //     Center,
@@ -13,12 +14,12 @@ use crate::grid::PipeCell;
 pub struct Course<'a> {
     steerings: &'a [Steering],
     has_tail: bool,
-    has_entered: bool,
+    has_head: bool,
 }
 
 impl<'a> Course<'a> {
     pub fn len_segments(&self) -> usize {
-        self.steerings.len() * 2 + self.has_entered as usize + self.has_tail as usize
+        self.steerings.len() * 2 + self.has_head as usize + self.has_tail as usize
     }
 }
 
@@ -27,7 +28,7 @@ impl<'a> Default for Course<'a> {
         Course {
             steerings: &[],
             has_tail: false,
-            has_entered: false,
+            has_head: false,
         }
     }
 }
@@ -38,22 +39,10 @@ pub struct Walk<'a> {
     course: Course<'a>,
 }
 
-impl<'a> Walk<'a> {
-    pub fn generate_cells(&self) -> Vec<(Position, PipeCell)> {
-        let mut outputs = Vec::new();
-
-        if self.course.has_tail {
-            outputs.push((Position::from_raw(0, 0), PipeCell::default()));
-        }
-
-        outputs
-    }
-}
-
 pub struct WalkIter<'a> {
     steerings_iter: std::slice::Iter<'a, Steering>,
     emit_tail: bool,
-    emit_entrance: bool,
+    emit_head: bool,
 
     curr_pos: Position,
     curr_dir: Direction,
@@ -63,14 +52,14 @@ impl<'a> WalkIter<'a> {
     pub fn new(walk: Walk<'a>) -> Self {
         let steerings_iter = walk.course.steerings.iter();
         let emit_tail = walk.course.has_tail;
-        let emit_entrance = walk.course.has_entered;
+        let emit_head = walk.course.has_head;
         let curr_pos = walk.position;
         let curr_dir = walk.heading;
 
         Self {
             steerings_iter,
             emit_tail,
-            emit_entrance,
+            emit_head,
             curr_pos,
             curr_dir,
         }
@@ -78,15 +67,56 @@ impl<'a> WalkIter<'a> {
 }
 
 impl<'a> Iterator for WalkIter<'a> {
-    type Item = (Position, PipeCell);
+    type Item = (Position, Cell);
 
     fn next(&mut self) -> Option<Self::Item> {
+        // Check to see if a tail needs to be emitted.
         if self.emit_tail {
             self.emit_tail = false;
 
-            // Calculate what the tail position and cell would be.
-        }
+            // Calculate what the tail position would be.
+            // This would be the current position, shifted one spot in the
+            // inverse of the current direction.
+            let pos = self.curr_pos.shift(self.curr_dir.invert(), 1);
 
-        None
+            let cell = Cell::default().with_dir(self.curr_dir, Pipe::Empty);
+
+            Some((pos, cell))
+        }
+        // Try and see if there are any `Steering`s available.
+        else if let Some(steering) = self.steerings_iter.next() {
+            // A `Steering` adjusts the current position and direction.
+            let next_dir = self.curr_dir.steer(*steering);
+            let next_pos = self.curr_pos.shift(next_dir, 1);
+
+            let pos = self.curr_pos;
+
+            // Each `Steering` represents an entrance AND exit from a cell.
+            let cell =
+                Cell::default()
+                .with_dir(self.curr_dir.invert(), Pipe::Empty)
+                .with_dir(next_dir.invert(), Pipe::Empty)
+            ;
+
+            self.curr_dir = next_dir;
+            self.curr_pos = next_pos;
+
+            Some((pos, cell))
+        }
+        // Check to see if a head needs to be emitted.
+        else if self.emit_head {
+            self.emit_head = false;
+
+            // The head position is just the current position.
+            let pos = self.curr_pos;
+
+            let cell = Cell::default().with_dir(self.curr_dir.invert(), Pipe::Empty);
+
+            Some((pos, cell))
+        }
+        // Nothing else to do.
+        else {
+            None
+        }
     }
 }
