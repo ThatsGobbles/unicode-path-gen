@@ -1,6 +1,7 @@
 use crate::grid::Direction;
 use crate::grid::Position;
 use crate::grid::Steering;
+use crate::grid::PipeCell;
 
 // pub enum Alignment {
 //     Center,
@@ -37,34 +38,55 @@ pub struct Walk<'a> {
     course: Course<'a>,
 }
 
+impl<'a> Walk<'a> {
+    pub fn generate_cells(&self) -> Vec<(Position, PipeCell)> {
+        let mut outputs = Vec::new();
+
+        if self.course.has_tail {
+            outputs.push((Position::from_raw(0, 0), PipeCell::default()));
+        }
+
+        outputs
+    }
+}
+
 pub struct WalkIter<'a> {
     steerings_iter: std::slice::Iter<'a, Steering>,
-    has_tail: bool,
-    has_entered: bool,
-
-    x_length: usize,
-    y_length: usize,
+    emit_tail: bool,
+    emit_entrance: bool,
 
     curr_pos: Position,
     curr_dir: Direction,
 }
 
 impl<'a> WalkIter<'a> {
-    pub fn new(walk: Walk<'a>, x_length: usize, y_length: usize) -> Self {
+    pub fn new(walk: Walk<'a>) -> Self {
         let steerings_iter = walk.course.steerings.iter();
-        let has_tail = walk.course.has_tail;
-        let has_entered = walk.course.has_entered;
+        let emit_tail = walk.course.has_tail;
+        let emit_entrance = walk.course.has_entered;
         let curr_pos = walk.position;
         let curr_dir = walk.heading;
 
         Self {
             steerings_iter,
-            has_tail,
-            has_entered,
-            x_length,
-            y_length,
+            emit_tail,
+            emit_entrance,
             curr_pos,
             curr_dir,
         }
+    }
+}
+
+impl<'a> Iterator for WalkIter<'a> {
+    type Item = (Position, PipeCell);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.emit_tail {
+            self.emit_tail = false;
+
+            // Calculate what the tail position and cell would be.
+        }
+
+        None
     }
 }
