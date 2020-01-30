@@ -5,9 +5,10 @@ use crate::grid::Position;
 use crate::grid::Steering;
 use crate::grid::Cell;
 
+#[derive(Clone, Copy)]
 pub struct Walk<'a> {
-    position: Position,
-    heading: Direction,
+    initial_pos: Position,
+    initial_dir: Direction,
 
     steerings: &'a [Steering],
     has_tail: bool,
@@ -17,6 +18,10 @@ pub struct Walk<'a> {
 impl<'a> Walk<'a> {
     pub fn len_segments(&self) -> usize {
         self.steerings.len() * 2 + self.has_head as usize + self.has_tail as usize
+    }
+
+    pub fn iter(&self) -> WalkIter<'a> {
+        WalkIter::new(self)
     }
 }
 
@@ -30,12 +35,12 @@ pub struct WalkIter<'a> {
 }
 
 impl<'a> WalkIter<'a> {
-    pub fn new(walk: Walk<'a>) -> Self {
+    pub fn new(walk: &Walk<'a>) -> Self {
         let steerings_iter = walk.steerings.iter();
         let emit_tail = walk.has_tail;
         let emit_head = walk.has_head;
-        let curr_pos = walk.position;
-        let curr_dir = walk.heading;
+        let curr_pos = walk.initial_pos;
+        let curr_dir = walk.initial_dir;
 
         Self {
             steerings_iter,
@@ -73,7 +78,7 @@ impl<'a> Iterator for WalkIter<'a> {
             let pos = self.curr_pos;
 
             // Each `Steering` represents an entrance AND exit from a cell.
-            let cell = Cell::from(self.curr_dir.invert()) | Cell::from(next_dir.invert());
+            let cell = Cell::from(self.curr_dir.invert()) | Cell::from(next_dir);
 
             self.curr_dir = next_dir;
             self.curr_pos = next_pos;
@@ -99,3 +104,33 @@ impl<'a> Iterator for WalkIter<'a> {
 }
 
 impl<'a> FusedIterator for WalkIter<'a> {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn next() {
+        let steerings = &[
+            Steering::Left,
+            Steering::Straight,
+            Steering::Right,
+            Steering::Straight,
+            Steering::Straight,
+            Steering::Right,
+            Steering::Left,
+        ];
+
+        let walk = Walk {
+            initial_pos: Position::from_raw(0, 0),
+            initial_dir: Direction::East,
+            steerings: steerings,
+            has_tail: true,
+            has_head: true,
+        };
+
+        for (pos, cell) in walk.iter() {
+            println!("({}, '{}')", pos, cell.char());
+        }
+    }
+}

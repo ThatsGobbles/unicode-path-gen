@@ -1,5 +1,6 @@
 use std::ops::{Add, Sub, Neg};
 use std::cmp::{Ord, PartialOrd, Ordering};
+use std::fmt::{Display, Formatter, Result as FmtResult};
 
 /// A one-dimensional, zero-indexed position of the center of a character cell.
 /// All coordinates are either strictly positive or strictly negative; there is
@@ -28,6 +29,15 @@ impl Coordinate {
         match self {
             &Self::Pos(a) => a < length,
             &Self::Neg(..) => false,
+        }
+    }
+}
+
+impl Display for Coordinate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        match self {
+            &Self::Pos(x) => write!(f, "+{}", x),
+            &Self::Neg(x) => write!(f, "-{}", x),
         }
     }
 }

@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter, Result as FmtResult};
+
 use crate::grid::Coordinate;
 use crate::grid::Direction;
 
@@ -33,6 +35,12 @@ impl Position {
     /// from [(0, 0), (x_length, y_length)).
     pub fn in_bounds(&self, x_length: usize, y_length: usize) -> bool {
         self.x.in_bounds(x_length) && self.y.in_bounds(y_length)
+    }
+}
+
+impl Display for Position {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(f, "({}, {})", self.x, self.y)
     }
 }
 
