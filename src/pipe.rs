@@ -35,10 +35,4 @@ impl PipeGrid {
         }
         else { None }
     }
-
-    pub fn clear(&mut self) {
-        for c in self.grid.iter_mut() {
-            c.clear();
-        }
-    }
 }

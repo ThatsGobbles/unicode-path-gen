@@ -21,9 +21,9 @@ impl Position {
     pub fn shift(&self, direction: Direction, n: usize) -> Self {
         let (x, y) = match direction {
             Direction::North => (self.x, self.y - n),
+            Direction::East => (self.x + n, self.y),
             Direction::South => (self.x, self.y + n),
             Direction::West => (self.x - n, self.y),
-            Direction::East => (self.x + n, self.y),
         };
 
         Self { x, y, }
@@ -59,10 +59,10 @@ mod tests {
                         let pos_nn = Position::new(xn, yn);
 
                         let (exp_xp, exp_xn, exp_yp, exp_yn) = match direction {
-                            Direction::West => (xp - shift_amount, xn - shift_amount, yp, yn),
-                            Direction::East => (xp + shift_amount, xn + shift_amount, yp, yn),
                             Direction::North => (xp, xn, yp - shift_amount, yn - shift_amount),
+                            Direction::East => (xp + shift_amount, xn + shift_amount, yp, yn),
                             Direction::South => (xp, xn, yp + shift_amount, yn + shift_amount),
+                            Direction::West => (xp - shift_amount, xn - shift_amount, yp, yn),
                         };
 
                         assert_eq!(pos_pp.shift(direction, shift_amount), Position::new(exp_xp, exp_yp));

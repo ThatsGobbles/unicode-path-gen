@@ -3,35 +3,21 @@ use std::iter::FusedIterator;
 use crate::grid::Direction;
 use crate::grid::Position;
 use crate::grid::Steering;
-use crate::grid::Pipe;
 use crate::grid::Cell;
 
-pub struct Course<'a> {
+pub struct Walk<'a> {
+    position: Position,
+    heading: Direction,
+
     steerings: &'a [Steering],
     has_tail: bool,
     has_head: bool,
 }
 
-impl<'a> Course<'a> {
+impl<'a> Walk<'a> {
     pub fn len_segments(&self) -> usize {
         self.steerings.len() * 2 + self.has_head as usize + self.has_tail as usize
     }
-}
-
-impl<'a> Default for Course<'a> {
-    fn default() -> Self {
-        Course {
-            steerings: &[],
-            has_tail: false,
-            has_head: false,
-        }
-    }
-}
-
-pub struct Walk<'a> {
-    position: Position,
-    heading: Direction,
-    course: Course<'a>,
 }
 
 pub struct WalkIter<'a> {
@@ -45,9 +31,9 @@ pub struct WalkIter<'a> {
 
 impl<'a> WalkIter<'a> {
     pub fn new(walk: Walk<'a>) -> Self {
-        let steerings_iter = walk.course.steerings.iter();
-        let emit_tail = walk.course.has_tail;
-        let emit_head = walk.course.has_head;
+        let steerings_iter = walk.steerings.iter();
+        let emit_tail = walk.has_tail;
+        let emit_head = walk.has_head;
         let curr_pos = walk.position;
         let curr_dir = walk.heading;
 
@@ -74,7 +60,7 @@ impl<'a> Iterator for WalkIter<'a> {
             // inverse of the current direction.
             let pos = self.curr_pos.shift(self.curr_dir.invert(), 1);
 
-            let cell = Cell::default().with_dir(self.curr_dir, Pipe::Empty);
+            let cell = Cell::from(self.curr_dir);
 
             Some((pos, cell))
         }
@@ -87,11 +73,7 @@ impl<'a> Iterator for WalkIter<'a> {
             let pos = self.curr_pos;
 
             // Each `Steering` represents an entrance AND exit from a cell.
-            let cell =
-                Cell::default()
-                .with_dir(self.curr_dir.invert(), Pipe::Empty)
-                .with_dir(next_dir.invert(), Pipe::Empty)
-            ;
+            let cell = Cell::from(self.curr_dir.invert()) | Cell::from(next_dir.invert());
 
             self.curr_dir = next_dir;
             self.curr_pos = next_pos;
@@ -105,7 +87,7 @@ impl<'a> Iterator for WalkIter<'a> {
             // The head position is just the current position.
             let pos = self.curr_pos;
 
-            let cell = Cell::default().with_dir(self.curr_dir.invert(), Pipe::Empty);
+            let cell = Cell::from(self.curr_dir.invert());
 
             Some((pos, cell))
         }

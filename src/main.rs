@@ -1,6 +1,5 @@
 pub mod pipe;
 pub mod grid;
-pub mod grid_walk;
 
 use cursive::Cursive;
 use cursive::Vec2;

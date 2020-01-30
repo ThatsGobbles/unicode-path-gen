@@ -1,209 +1,187 @@
+use std::ops::BitOr;
+
 use crate::grid::Direction;
 
-const XN_XS_XW_XE: char = ' ';
-const XN_XS_XW_EE: char = '╶';
-const XN_XS_XW_FE: char = '╺';
-const XN_XS_EW_XE: char = '╴';
-const XN_XS_EW_EE: char = '─';
-const XN_XS_EW_FE: char = '╼';
-const XN_XS_FW_XE: char = '╸';
-const XN_XS_FW_EE: char = '╾';
-const XN_XS_FW_FE: char = '━';
-const XN_ES_XW_XE: char = '╷';
-const XN_ES_XW_EE: char = '┌';
-const XN_ES_XW_FE: char = '┍';
-const XN_ES_EW_XE: char = '┐';
-const XN_ES_EW_EE: char = '┬';
-const XN_ES_EW_FE: char = '┮';
-const XN_ES_FW_XE: char = '┑';
-const XN_ES_FW_EE: char = '┭';
-const XN_ES_FW_FE: char = '┯';
-const XN_FS_XW_XE: char = '╻';
-const XN_FS_XW_EE: char = '┎';
-const XN_FS_XW_FE: char = '┏';
-const XN_FS_EW_XE: char = '┒';
-const XN_FS_EW_EE: char = '┰';
-const XN_FS_EW_FE: char = '┲';
-const XN_FS_FW_XE: char = '┓';
-const XN_FS_FW_EE: char = '┱';
-const XN_FS_FW_FE: char = '┳';
-const EN_XS_XW_XE: char = '╵';
-const EN_XS_XW_EE: char = '└';
-const EN_XS_XW_FE: char = '┕';
-const EN_XS_EW_XE: char = '┘';
-const EN_XS_EW_EE: char = '┴';
-const EN_XS_EW_FE: char = '┶';
-const EN_XS_FW_XE: char = '┙';
-const EN_XS_FW_EE: char = '┵';
-const EN_XS_FW_FE: char = '┷';
-const EN_ES_XW_XE: char = '│';
-const EN_ES_XW_EE: char = '├';
-const EN_ES_XW_FE: char = '┝';
-const EN_ES_EW_XE: char = '┤';
-const EN_ES_EW_EE: char = '┼';
-const EN_ES_EW_FE: char = '┾';
-const EN_ES_FW_XE: char = '┥';
-const EN_ES_FW_EE: char = '┽';
-const EN_ES_FW_FE: char = '┿';
-const EN_FS_XW_XE: char = '╽';
-const EN_FS_XW_EE: char = '┟';
-const EN_FS_XW_FE: char = '┢';
-const EN_FS_EW_XE: char = '┧';
-const EN_FS_EW_EE: char = '╁';
-const EN_FS_EW_FE: char = '╆';
-const EN_FS_FW_XE: char = '┪';
-const EN_FS_FW_EE: char = '╅';
-const EN_FS_FW_FE: char = '╈';
-const FN_XS_XW_XE: char = '╹';
-const FN_XS_XW_EE: char = '┖';
-const FN_XS_XW_FE: char = '┗';
-const FN_XS_EW_XE: char = '┚';
-const FN_XS_EW_EE: char = '┸';
-const FN_XS_EW_FE: char = '┺';
-const FN_XS_FW_XE: char = '┛';
-const FN_XS_FW_EE: char = '┹';
-const FN_XS_FW_FE: char = '┻';
-const FN_ES_XW_XE: char = '╿';
-const FN_ES_XW_EE: char = '┞';
-const FN_ES_XW_FE: char = '┡';
-const FN_ES_EW_XE: char = '┦';
-const FN_ES_EW_EE: char = '╀';
-const FN_ES_EW_FE: char = '╄';
-const FN_ES_FW_XE: char = '┩';
-const FN_ES_FW_EE: char = '╃';
-const FN_ES_FW_FE: char = '╇';
-const FN_FS_XW_XE: char = '┃';
-const FN_FS_XW_EE: char = '┠';
-const FN_FS_XW_FE: char = '┣';
-const FN_FS_EW_XE: char = '┨';
-const FN_FS_EW_EE: char = '╂';
-const FN_FS_EW_FE: char = '╊';
-const FN_FS_FW_XE: char = '┫';
-const FN_FS_FW_EE: char = '╉';
-const FN_FS_FW_FE: char = '╋';
+const N0_E0_S0_W0: char = ' ';
+const N0_E0_S0_W1: char = '╴';
+const N0_E0_S1_W0: char = '╷';
+const N0_E0_S1_W1: char = '┐';
+const N0_E1_S0_W0: char = '╶';
+const N0_E1_S0_W1: char = '─';
+const N0_E1_S1_W0: char = '┌';
+const N0_E1_S1_W1: char = '┬';
+const N1_E0_S0_W0: char = '╵';
+const N1_E0_S0_W1: char = '┘';
+const N1_E0_S1_W0: char = '│';
+const N1_E0_S1_W1: char = '┤';
+const N1_E1_S0_W0: char = '└';
+const N1_E1_S0_W1: char = '┴';
+const N1_E1_S1_W0: char = '├';
+const N1_E1_S1_W1: char = '┼';
 
-#[derive(Copy, Clone)]
-pub enum Pipe {
-    None,
-    Empty,
-    Full,
-}
+// const XN_XE_XS_XW: char = ' ';
+// const XN_EE_XS_XW: char = '╶';
+// const XN_FE_XS_XW: char = '╺';
+// const XN_XE_XS_EW: char = '╴';
+// const XN_EE_XS_EW: char = '─';
+// const XN_FE_XS_EW: char = '╼';
+// const XN_XE_XS_FW: char = '╸';
+// const XN_EE_XS_FW: char = '╾';
+// const XN_FE_XS_FW: char = '━';
+// const XN_XE_ES_XW: char = '╷';
+// const XN_EE_ES_XW: char = '┌';
+// const XN_FE_ES_XW: char = '┍';
+// const XN_XE_ES_EW: char = '┐';
+// const XN_EE_ES_EW: char = '┬';
+// const XN_FE_ES_EW: char = '┮';
+// const XN_XE_ES_FW: char = '┑';
+// const XN_EE_ES_FW: char = '┭';
+// const XN_FE_ES_FW: char = '┯';
+// const XN_XE_FS_XW: char = '╻';
+// const XN_EE_FS_XW: char = '┎';
+// const XN_FE_FS_XW: char = '┏';
+// const XN_XE_FS_EW: char = '┒';
+// const XN_EE_FS_EW: char = '┰';
+// const XN_FE_FS_EW: char = '┲';
+// const XN_XE_FS_FW: char = '┓';
+// const XN_EE_FS_FW: char = '┱';
+// const XN_FE_FS_FW: char = '┳';
+// const EN_XE_XS_XW: char = '╵';
+// const EN_EE_XS_XW: char = '└';
+// const EN_FE_XS_XW: char = '┕';
+// const EN_XE_XS_EW: char = '┘';
+// const EN_EE_XS_EW: char = '┴';
+// const EN_FE_XS_EW: char = '┶';
+// const EN_XE_XS_FW: char = '┙';
+// const EN_EE_XS_FW: char = '┵';
+// const EN_FE_XS_FW: char = '┷';
+// const EN_XE_ES_XW: char = '│';
+// const EN_EE_ES_XW: char = '├';
+// const EN_FE_ES_XW: char = '┝';
+// const EN_XE_ES_EW: char = '┤';
+// const EN_EE_ES_EW: char = '┼';
+// const EN_FE_ES_EW: char = '┾';
+// const EN_XE_ES_FW: char = '┥';
+// const EN_EE_ES_FW: char = '┽';
+// const EN_FE_ES_FW: char = '┿';
+// const EN_XE_FS_XW: char = '╽';
+// const EN_EE_FS_XW: char = '┟';
+// const EN_FE_FS_XW: char = '┢';
+// const EN_XE_FS_EW: char = '┧';
+// const EN_EE_FS_EW: char = '╁';
+// const EN_FE_FS_EW: char = '╆';
+// const EN_XE_FS_FW: char = '┪';
+// const EN_EE_FS_FW: char = '╅';
+// const EN_FE_FS_FW: char = '╈';
+// const FN_XE_XS_XW: char = '╹';
+// const FN_EE_XS_XW: char = '┖';
+// const FN_FE_XS_XW: char = '┗';
+// const FN_XE_XS_EW: char = '┚';
+// const FN_EE_XS_EW: char = '┸';
+// const FN_FE_XS_EW: char = '┺';
+// const FN_XE_XS_FW: char = '┛';
+// const FN_EE_XS_FW: char = '┹';
+// const FN_FE_XS_FW: char = '┻';
+// const FN_XE_ES_XW: char = '╿';
+// const FN_EE_ES_XW: char = '┞';
+// const FN_FE_ES_XW: char = '┡';
+// const FN_XE_ES_EW: char = '┦';
+// const FN_EE_ES_EW: char = '╀';
+// const FN_FE_ES_EW: char = '╄';
+// const FN_XE_ES_FW: char = '┩';
+// const FN_EE_ES_FW: char = '╃';
+// const FN_FE_ES_FW: char = '╇';
+// const FN_XE_FS_XW: char = '┃';
+// const FN_EE_FS_XW: char = '┠';
+// const FN_FE_FS_XW: char = '┣';
+// const FN_XE_FS_EW: char = '┨';
+// const FN_EE_FS_EW: char = '╂';
+// const FN_FE_FS_EW: char = '╊';
+// const FN_XE_FS_FW: char = '┫';
+// const FN_EE_FS_FW: char = '╉';
+// const FN_FE_FS_FW: char = '╋';
 
-#[derive(Copy, Clone)]
+// #[derive(Copy, Clone)]
+// pub enum Pipe {
+//     None,
+//     Empty,
+//     Full,
+// }
+
+// impl BitOr for Pipe {
+//     type Output = Self;
+
+//     fn bitor(self, rhs: Self) -> Self {
+//         match (self, rhs) {
+//             (Self::None, rhs) => rhs,
+//             (lhs, Self::None) => lhs,
+//             (Self::Empty, rhs) => rhs,
+//             (lhs, Self::Empty) => lhs,
+//             (Self::Full, Self::Full) => Self::Full,
+//         }
+//     }
+// }
+
+const CELL_N: Cell = Cell { n: true, e: false, s: false, w: false, };
+const CELL_E: Cell = Cell { n: false, e: true, s: false, w: false, };
+const CELL_S: Cell = Cell { n: false, e: false, s: true, w: false, };
+const CELL_W: Cell = Cell { n: false, e: false, s: false, w: true, };
+
+#[derive(Copy, Clone, Default)]
 pub struct Cell {
-    n: Pipe,
-    s: Pipe,
-    w: Pipe,
-    e: Pipe,
+    n: bool,
+    e: bool,
+    s: bool,
+    w: bool,
 }
 
-impl Default for Cell {
-    fn default() -> Self {
-        Self { n: Pipe::None, s: Pipe::None, w: Pipe::None, e: Pipe::None, }
+impl BitOr for Cell {
+    type Output = Self;
+
+    fn bitor(self, rhs: Self) -> Self {
+        Self {
+            n: self.n | rhs.n,
+            e: self.e | rhs.e,
+            s: self.s | rhs.s,
+            w: self.w | rhs.w,
+        }
+    }
+}
+
+impl From<Direction> for Cell {
+    fn from(dir: Direction) -> Self {
+        match dir {
+            Direction::North => CELL_N,
+            Direction::East => CELL_E,
+            Direction::South => CELL_S,
+            Direction::West => CELL_W,
+        }
     }
 }
 
 impl Cell {
-    pub fn clear(&mut self) {
-        *self = Self::default();
-    }
-
-    pub fn with_dir(&self, dir: Direction, pipe: Pipe) -> Self {
-        let mut cell = *self;
-
-        match dir {
-            Direction::North => cell.n = pipe,
-            Direction::South => cell.s = pipe,
-            Direction::West => cell.w = pipe,
-            Direction::East => cell.e = pipe,
-        };
-
-        cell
+    pub fn new(n: bool, e: bool, s: bool, w: bool) -> Self {
+        Self { n, e, s, w, }
     }
 
     pub fn char(&self) -> char {
-        match (self.n, self.s, self.w, self.e) {
-            ( Pipe::None,  Pipe::None,  Pipe::None,  Pipe::None,) => XN_XS_XW_XE,
-            ( Pipe::None,  Pipe::None,  Pipe::None, Pipe::Empty,) => XN_XS_XW_EE,
-            ( Pipe::None,  Pipe::None,  Pipe::None,  Pipe::Full,) => XN_XS_XW_FE,
-            ( Pipe::None,  Pipe::None, Pipe::Empty,  Pipe::None,) => XN_XS_EW_XE,
-            ( Pipe::None,  Pipe::None, Pipe::Empty, Pipe::Empty,) => XN_XS_EW_EE,
-            ( Pipe::None,  Pipe::None, Pipe::Empty,  Pipe::Full,) => XN_XS_EW_FE,
-            ( Pipe::None,  Pipe::None,  Pipe::Full,  Pipe::None,) => XN_XS_FW_XE,
-            ( Pipe::None,  Pipe::None,  Pipe::Full, Pipe::Empty,) => XN_XS_FW_EE,
-            ( Pipe::None,  Pipe::None,  Pipe::Full,  Pipe::Full,) => XN_XS_FW_FE,
-            ( Pipe::None, Pipe::Empty,  Pipe::None,  Pipe::None,) => XN_ES_XW_XE,
-            ( Pipe::None, Pipe::Empty,  Pipe::None, Pipe::Empty,) => XN_ES_XW_EE,
-            ( Pipe::None, Pipe::Empty,  Pipe::None,  Pipe::Full,) => XN_ES_XW_FE,
-            ( Pipe::None, Pipe::Empty, Pipe::Empty,  Pipe::None,) => XN_ES_EW_XE,
-            ( Pipe::None, Pipe::Empty, Pipe::Empty, Pipe::Empty,) => XN_ES_EW_EE,
-            ( Pipe::None, Pipe::Empty, Pipe::Empty,  Pipe::Full,) => XN_ES_EW_FE,
-            ( Pipe::None, Pipe::Empty,  Pipe::Full,  Pipe::None,) => XN_ES_FW_XE,
-            ( Pipe::None, Pipe::Empty,  Pipe::Full, Pipe::Empty,) => XN_ES_FW_EE,
-            ( Pipe::None, Pipe::Empty,  Pipe::Full,  Pipe::Full,) => XN_ES_FW_FE,
-            ( Pipe::None,  Pipe::Full,  Pipe::None,  Pipe::None,) => XN_FS_XW_XE,
-            ( Pipe::None,  Pipe::Full,  Pipe::None, Pipe::Empty,) => XN_FS_XW_EE,
-            ( Pipe::None,  Pipe::Full,  Pipe::None,  Pipe::Full,) => XN_FS_XW_FE,
-            ( Pipe::None,  Pipe::Full, Pipe::Empty,  Pipe::None,) => XN_FS_EW_XE,
-            ( Pipe::None,  Pipe::Full, Pipe::Empty, Pipe::Empty,) => XN_FS_EW_EE,
-            ( Pipe::None,  Pipe::Full, Pipe::Empty,  Pipe::Full,) => XN_FS_EW_FE,
-            ( Pipe::None,  Pipe::Full,  Pipe::Full,  Pipe::None,) => XN_FS_FW_XE,
-            ( Pipe::None,  Pipe::Full,  Pipe::Full, Pipe::Empty,) => XN_FS_FW_EE,
-            ( Pipe::None,  Pipe::Full,  Pipe::Full,  Pipe::Full,) => XN_FS_FW_FE,
-            (Pipe::Empty,  Pipe::None,  Pipe::None,  Pipe::None,) => EN_XS_XW_XE,
-            (Pipe::Empty,  Pipe::None,  Pipe::None, Pipe::Empty,) => EN_XS_XW_EE,
-            (Pipe::Empty,  Pipe::None,  Pipe::None,  Pipe::Full,) => EN_XS_XW_FE,
-            (Pipe::Empty,  Pipe::None, Pipe::Empty,  Pipe::None,) => EN_XS_EW_XE,
-            (Pipe::Empty,  Pipe::None, Pipe::Empty, Pipe::Empty,) => EN_XS_EW_EE,
-            (Pipe::Empty,  Pipe::None, Pipe::Empty,  Pipe::Full,) => EN_XS_EW_FE,
-            (Pipe::Empty,  Pipe::None,  Pipe::Full,  Pipe::None,) => EN_XS_FW_XE,
-            (Pipe::Empty,  Pipe::None,  Pipe::Full, Pipe::Empty,) => EN_XS_FW_EE,
-            (Pipe::Empty,  Pipe::None,  Pipe::Full,  Pipe::Full,) => EN_XS_FW_FE,
-            (Pipe::Empty, Pipe::Empty,  Pipe::None,  Pipe::None,) => EN_ES_XW_XE,
-            (Pipe::Empty, Pipe::Empty,  Pipe::None, Pipe::Empty,) => EN_ES_XW_EE,
-            (Pipe::Empty, Pipe::Empty,  Pipe::None,  Pipe::Full,) => EN_ES_XW_FE,
-            (Pipe::Empty, Pipe::Empty, Pipe::Empty,  Pipe::None,) => EN_ES_EW_XE,
-            (Pipe::Empty, Pipe::Empty, Pipe::Empty, Pipe::Empty,) => EN_ES_EW_EE,
-            (Pipe::Empty, Pipe::Empty, Pipe::Empty,  Pipe::Full,) => EN_ES_EW_FE,
-            (Pipe::Empty, Pipe::Empty,  Pipe::Full,  Pipe::None,) => EN_ES_FW_XE,
-            (Pipe::Empty, Pipe::Empty,  Pipe::Full, Pipe::Empty,) => EN_ES_FW_EE,
-            (Pipe::Empty, Pipe::Empty,  Pipe::Full,  Pipe::Full,) => EN_ES_FW_FE,
-            (Pipe::Empty,  Pipe::Full,  Pipe::None,  Pipe::None,) => EN_FS_XW_XE,
-            (Pipe::Empty,  Pipe::Full,  Pipe::None, Pipe::Empty,) => EN_FS_XW_EE,
-            (Pipe::Empty,  Pipe::Full,  Pipe::None,  Pipe::Full,) => EN_FS_XW_FE,
-            (Pipe::Empty,  Pipe::Full, Pipe::Empty,  Pipe::None,) => EN_FS_EW_XE,
-            (Pipe::Empty,  Pipe::Full, Pipe::Empty, Pipe::Empty,) => EN_FS_EW_EE,
-            (Pipe::Empty,  Pipe::Full, Pipe::Empty,  Pipe::Full,) => EN_FS_EW_FE,
-            (Pipe::Empty,  Pipe::Full,  Pipe::Full,  Pipe::None,) => EN_FS_FW_XE,
-            (Pipe::Empty,  Pipe::Full,  Pipe::Full, Pipe::Empty,) => EN_FS_FW_EE,
-            (Pipe::Empty,  Pipe::Full,  Pipe::Full,  Pipe::Full,) => EN_FS_FW_FE,
-            ( Pipe::Full,  Pipe::None,  Pipe::None,  Pipe::None,) => FN_XS_XW_XE,
-            ( Pipe::Full,  Pipe::None,  Pipe::None, Pipe::Empty,) => FN_XS_XW_EE,
-            ( Pipe::Full,  Pipe::None,  Pipe::None,  Pipe::Full,) => FN_XS_XW_FE,
-            ( Pipe::Full,  Pipe::None, Pipe::Empty,  Pipe::None,) => FN_XS_EW_XE,
-            ( Pipe::Full,  Pipe::None, Pipe::Empty, Pipe::Empty,) => FN_XS_EW_EE,
-            ( Pipe::Full,  Pipe::None, Pipe::Empty,  Pipe::Full,) => FN_XS_EW_FE,
-            ( Pipe::Full,  Pipe::None,  Pipe::Full,  Pipe::None,) => FN_XS_FW_XE,
-            ( Pipe::Full,  Pipe::None,  Pipe::Full, Pipe::Empty,) => FN_XS_FW_EE,
-            ( Pipe::Full,  Pipe::None,  Pipe::Full,  Pipe::Full,) => FN_XS_FW_FE,
-            ( Pipe::Full, Pipe::Empty,  Pipe::None,  Pipe::None,) => FN_ES_XW_XE,
-            ( Pipe::Full, Pipe::Empty,  Pipe::None, Pipe::Empty,) => FN_ES_XW_EE,
-            ( Pipe::Full, Pipe::Empty,  Pipe::None,  Pipe::Full,) => FN_ES_XW_FE,
-            ( Pipe::Full, Pipe::Empty, Pipe::Empty,  Pipe::None,) => FN_ES_EW_XE,
-            ( Pipe::Full, Pipe::Empty, Pipe::Empty, Pipe::Empty,) => FN_ES_EW_EE,
-            ( Pipe::Full, Pipe::Empty, Pipe::Empty,  Pipe::Full,) => FN_ES_EW_FE,
-            ( Pipe::Full, Pipe::Empty,  Pipe::Full,  Pipe::None,) => FN_ES_FW_XE,
-            ( Pipe::Full, Pipe::Empty,  Pipe::Full, Pipe::Empty,) => FN_ES_FW_EE,
-            ( Pipe::Full, Pipe::Empty,  Pipe::Full,  Pipe::Full,) => FN_ES_FW_FE,
-            ( Pipe::Full,  Pipe::Full,  Pipe::None,  Pipe::None,) => FN_FS_XW_XE,
-            ( Pipe::Full,  Pipe::Full,  Pipe::None, Pipe::Empty,) => FN_FS_XW_EE,
-            ( Pipe::Full,  Pipe::Full,  Pipe::None,  Pipe::Full,) => FN_FS_XW_FE,
-            ( Pipe::Full,  Pipe::Full, Pipe::Empty,  Pipe::None,) => FN_FS_EW_XE,
-            ( Pipe::Full,  Pipe::Full, Pipe::Empty, Pipe::Empty,) => FN_FS_EW_EE,
-            ( Pipe::Full,  Pipe::Full, Pipe::Empty,  Pipe::Full,) => FN_FS_EW_FE,
-            ( Pipe::Full,  Pipe::Full,  Pipe::Full,  Pipe::None,) => FN_FS_FW_XE,
-            ( Pipe::Full,  Pipe::Full,  Pipe::Full, Pipe::Empty,) => FN_FS_FW_EE,
-            ( Pipe::Full,  Pipe::Full,  Pipe::Full,  Pipe::Full,) => FN_FS_FW_FE,
+        match (self.n, self.e, self.s, self.w) {
+            (false, false, false, false) => N0_E0_S0_W0,
+            (false, false, false,  true) => N0_E0_S0_W1,
+            (false, false,  true, false) => N0_E0_S1_W0,
+            (false, false,  true,  true) => N0_E0_S1_W1,
+            (false,  true, false, false) => N0_E1_S0_W0,
+            (false,  true, false,  true) => N0_E1_S0_W1,
+            (false,  true,  true, false) => N0_E1_S1_W0,
+            (false,  true,  true,  true) => N0_E1_S1_W1,
+            ( true, false, false, false) => N1_E0_S0_W0,
+            ( true, false, false,  true) => N1_E0_S0_W1,
+            ( true, false,  true, false) => N1_E0_S1_W0,
+            ( true, false,  true,  true) => N1_E0_S1_W1,
+            ( true,  true, false, false) => N1_E1_S0_W0,
+            ( true,  true, false,  true) => N1_E1_S0_W1,
+            ( true,  true,  true, false) => N1_E1_S1_W0,
+            ( true,  true,  true,  true) => N1_E1_S1_W1,
         }
     }
 }
