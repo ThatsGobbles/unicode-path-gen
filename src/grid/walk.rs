@@ -1,15 +1,10 @@
+use std::iter::FusedIterator;
+
 use crate::grid::Direction;
 use crate::grid::Position;
 use crate::grid::Steering;
 use crate::grid::Pipe;
 use crate::grid::Cell;
-
-// pub enum Alignment {
-//     Center,
-//     Border(Direction),
-// }
-
-// pub struct Anchor(Position)
 
 pub struct Course<'a> {
     steerings: &'a [Steering],
@@ -120,3 +115,5 @@ impl<'a> Iterator for WalkIter<'a> {
         }
     }
 }
+
+impl<'a> FusedIterator for WalkIter<'a> {}
