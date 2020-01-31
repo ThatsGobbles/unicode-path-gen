@@ -1,36 +1,43 @@
 use crate::grid::Position;
 use crate::grid::Direction;
 
-pub enum Anchor {
-    /// An anchoring at the border of a cell, heading inwards towards the cell's
-    /// center.
-    Border(Position, Direction),
-    /// An anchoring at the center of a cell, heading outwards towards one of
-    /// the cell's borders.
-    Center(Position, Direction),
+/// An anchoring at the border or center of a cell, heading in a specified direction.
+#[derive(Clone, Copy, Debug)]
+pub struct Anchor {
+    position: Position,
+    heading: Direction,
+    is_centered: bool,
 }
 
 impl Anchor {
-    pub fn position(&self) -> Position {
-        match self {
-            &Self::Border(pos, _) => pos,
-            &Self::Center(pos, _) => pos,
+    pub fn new(position: Position, heading: Direction, is_centered: bool) -> Self {
+        Self {
+            position,
+            heading,
+            is_centered,
         }
+    }
+
+    pub fn position(&self) -> Position {
+        self.position
     }
 
     /// The `Direction` a path would initially travel in if it were to start at
     /// this `Anchor`.
     pub fn heading(&self) -> Direction {
-        match self {
-            &Self::Border(_, dir) => dir.invert(),
-            &Self::Center(_, dir) => dir,
-        }
+        self.heading
     }
 
-    pub fn is_central(&self) -> bool {
-        match self {
-            &Self::Border(..) => false,
-            &Self::Center(..) => true,
-        }
+    pub fn is_centered(&self) -> bool {
+        self.is_centered
+    }
+
+    pub fn border(&self) -> Option<Direction> {
+        if self.is_centered() { None }
+        else { Some(self.heading().invert()) }
+    }
+
+    pub fn len_segments(&self) -> usize {
+        self.is_centered() as usize
     }
 }
