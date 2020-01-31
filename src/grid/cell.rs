@@ -127,7 +127,7 @@ const CELL_E: Cell = Cell { n: false, e: true, s: false, w: false, };
 const CELL_S: Cell = Cell { n: false, e: false, s: true, w: false, };
 const CELL_W: Cell = Cell { n: false, e: false, s: false, w: true, };
 
-#[derive(Copy, Clone, Default)]
+#[derive(Copy, Clone, Default, PartialEq, Eq, Debug)]
 pub struct Cell {
     n: bool,
     e: bool,

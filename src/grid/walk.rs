@@ -7,17 +7,34 @@ use crate::grid::Cell;
 
 #[derive(Clone, Copy)]
 pub struct Walk<'a> {
-    initial_pos: Position,
-    initial_dir: Direction,
+    start_position: Position,
+    start_direction: Direction,
 
     steerings: &'a [Steering],
-    has_tail: bool,
-    has_head: bool,
+    starts_in_center: bool,
+    closes_in_center: bool,
 }
 
 impl<'a> Walk<'a> {
+    pub fn new(
+        start_position: Position,
+        start_direction: Direction,
+        steerings: &'a [Steering],
+        starts_in_center: bool,
+        closes_in_center: bool,
+        ) -> Self
+    {
+        Self {
+            start_position,
+            start_direction,
+            steerings,
+            starts_in_center,
+            closes_in_center,
+        }
+    }
+
     pub fn len_segments(&self) -> usize {
-        self.steerings.len() * 2 + self.has_head as usize + self.has_tail as usize
+        self.steerings.len() * 2 + self.closes_in_center as usize + self.starts_in_center as usize
     }
 
     pub fn iter(&self) -> WalkIter<'a> {
@@ -27,8 +44,8 @@ impl<'a> Walk<'a> {
 
 pub struct WalkIter<'a> {
     steerings_iter: std::slice::Iter<'a, Steering>,
-    emit_tail: bool,
-    emit_head: bool,
+    starts_in_center: bool,
+    closes_in_center: bool,
 
     curr_pos: Position,
     curr_dir: Direction,
@@ -37,15 +54,15 @@ pub struct WalkIter<'a> {
 impl<'a> WalkIter<'a> {
     pub fn new(walk: &Walk<'a>) -> Self {
         let steerings_iter = walk.steerings.iter();
-        let emit_tail = walk.has_tail;
-        let emit_head = walk.has_head;
-        let curr_pos = walk.initial_pos;
-        let curr_dir = walk.initial_dir;
+        let starts_in_center = walk.starts_in_center;
+        let closes_in_center = walk.closes_in_center;
+        let curr_pos = walk.start_position;
+        let curr_dir = walk.start_direction;
 
         Self {
             steerings_iter,
-            emit_tail,
-            emit_head,
+            starts_in_center,
+            closes_in_center,
             curr_pos,
             curr_dir,
         }
@@ -57,15 +74,16 @@ impl<'a> Iterator for WalkIter<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         // Check to see if a tail needs to be emitted.
-        if self.emit_tail {
-            self.emit_tail = false;
+        if self.starts_in_center {
+            self.starts_in_center = false;
 
-            // Calculate what the tail position would be.
-            // This would be the current position, shifted one spot in the
-            // inverse of the current direction.
-            let pos = self.curr_pos.shift(self.curr_dir.invert(), 1);
+            let next_pos = self.curr_pos.shift(self.curr_dir, 1);
 
+            // The tail position is just the current position.
+            let pos = self.curr_pos;
             let cell = Cell::from(self.curr_dir);
+
+            self.curr_pos = next_pos;
 
             Some((pos, cell))
         }
@@ -86,8 +104,8 @@ impl<'a> Iterator for WalkIter<'a> {
             Some((pos, cell))
         }
         // Check to see if a head needs to be emitted.
-        else if self.emit_head {
-            self.emit_head = false;
+        else if self.closes_in_center {
+            self.closes_in_center = false;
 
             // The head position is just the current position.
             let pos = self.curr_pos;
@@ -110,6 +128,39 @@ mod tests {
     use super::*;
 
     #[test]
+    fn invariants() {
+        let dummy_pos = Position::from_raw(0, 0);
+        let dummy_dir = Direction::North;
+
+        let empty_walk = Walk::new(dummy_pos, dummy_dir, &[], false, false);
+        let mut iter = empty_walk.iter();
+        assert_eq!(None, iter.next());
+
+        let head_only_walk = Walk::new(dummy_pos, dummy_dir, &[], false, true);
+        let mut iter = head_only_walk.iter();
+        assert_eq!(Some((dummy_pos, Cell::from(dummy_dir.invert()))), iter.next());
+        assert_eq!(None, iter.next());
+
+        let tail_only_walk = Walk::new(dummy_pos, dummy_dir, &[], true, false);
+        let mut iter = tail_only_walk.iter();
+        assert_eq!(Some((dummy_pos, Cell::from(dummy_dir))), iter.next());
+        assert_eq!(None, iter.next());
+
+        // let head_tail_only_walk = Walk::new(dummy_pos, dummy_dir, &[], true, true);
+        // let mut iter = head_tail_only_walk.iter();
+        // assert_eq!(Some((dummy_pos, Cell::from(dummy_dir.invert()))), iter.next());
+        // assert_eq!(Some((dummy_pos.shift(dummy_dir, 1), Cell::from(dummy_dir))), iter.next());
+        // assert_eq!(None, iter.next());
+
+        // let steerings = &[
+        //     Steering::Right,
+        //     Steering::Left,
+        //     Steering::Straight,
+        //     Steering::Left,
+        // ];
+    }
+
+    #[test]
     fn next() {
         let steerings = &[
             Steering::Left,
@@ -122,11 +173,12 @@ mod tests {
         ];
 
         let walk = Walk {
-            initial_pos: Position::from_raw(0, 0),
-            initial_dir: Direction::East,
+            start_position: Position::from_raw(17, 17),
+            start_direction: Direction::East,
             steerings: steerings,
-            has_tail: true,
-            has_head: true,
+            // starts_in_center: true,
+            starts_in_center: true,
+            closes_in_center: true,
         };
 
         for (pos, cell) in walk.iter() {

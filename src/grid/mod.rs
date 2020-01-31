@@ -4,6 +4,7 @@ pub mod direction;
 pub mod steering;
 pub mod walk;
 pub mod cell;
+pub mod anchor;
 
 pub use self::coordinate::Coordinate;
 pub use self::position::Position;
